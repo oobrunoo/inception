@@ -1,5 +1,5 @@
 COMPOSE_FILE    = srcs/docker-compose.yml
-DATA_DIR        = /home/aarie-c2/data
+DATA_DIR        = /home/brnascim/data
 
 all: create_dirs
 	docker compose -f $(COMPOSE_FILE) up -d --build
@@ -7,7 +7,6 @@ all: create_dirs
 create_dirs:
 	@mkdir -p $(DATA_DIR)/mariadb
 	@mkdir -p $(DATA_DIR)/wordpress
-	@mkdir -p $(DATA_DIR)/portainer  # 💡 Garante que a pasta nasça no host
 
 down:
 	docker compose -f $(COMPOSE_FILE) down

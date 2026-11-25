@@ -51,30 +51,30 @@ newgrp docker
 
 ---
 
-## 3. Storage & Domain Mapping (Specific to `aarie-c2`)
+## 3. Storage & Domain Mapping (Specific to `brnascim`)
 
-The peer repository is configured to use the user login `aarie-c2`. The evaluation checklist and subject state:
+The peer repository is configured to use the user login `brnascim`. The evaluation checklist and subject state:
 > *Verify that the standard output contains the path '/home/login/data/'*
 
 We must create this exact path on the host system.
 
 ### Step A: Create Host Directories
-Since the VM's login might be different (e.g. `aline-arthur`), we must create the directory structure at `/home/aarie-c2` using administrative privileges:
+Since the VM's login might be different (e.g. `aline-arthur`), we must create the directory structure at `/home/brnascim` using administrative privileges:
 ```bash
-sudo mkdir -p /home/aarie-c2/data/mariadb
-sudo mkdir -p /home/aarie-c2/data/wordpress
-sudo mkdir -p /home/aarie-c2/data/portainer
+sudo mkdir -p /home/brnascim/data/mariadb
+sudo mkdir -p /home/brnascim/data/wordpress
+sudo mkdir -p /home/brnascim/data/portainer
 
 # Change ownership to the active VM user (e.g. aline-arthur) so that Docker and make can read/write to it:
-sudo chown -R $USER:$USER /home/aarie-c2
+sudo chown -R $USER:$USER /home/brnascim
 ```
 
 ### Step B: DNS Local Mapping
 The project demands the domain `login.42.fr` to point locally. Add it to `/etc/hosts`:
 ```bash
-echo "127.0.0.1  aarie-c2.42.fr" | sudo tee -a /etc/hosts
+echo "127.0.0.1  brnascim.42.fr" | sudo tee -a /etc/hosts
 ```
-*Verify with:* `ping -c 2 aarie-c2.42.fr` (should resolve to `127.0.0.1`).
+*Verify with:* `ping -c 2 brnascim.42.fr` (should resolve to `127.0.0.1`).
 
 ---
 
@@ -114,14 +114,14 @@ Check the following to ensure the VM is fully functional and ready for peer eval
 
 | Target | Command / Check | Expected Behavior |
 |--------|-----------------|-------------------|
-| **NGINX / SSL** | `curl -kIv https://aarie-c2.42.fr` | Returns HTTP 200, uses TLS 1.2 or 1.3, SSL certificate details shown. |
-| **Port 80 Block** | `curl -I http://aarie-c2.42.fr` | Connection refused or timed out (must NOT serve HTTP). |
-| **WordPress DB** | Log in at `https://aarie-c2.42.fr/wp-admin` | Admin dashboard loads. Admin user must NOT contain "admin". |
+| **NGINX / SSL** | `curl -kIv https://brnascim.42.fr` | Returns HTTP 200, uses TLS 1.2 or 1.3, SSL certificate details shown. |
+| **Port 80 Block** | `curl -I http://brnascim.42.fr` | Connection refused or timed out (must NOT serve HTTP). |
+| **WordPress DB** | Log in at `https://brnascim.42.fr/wp-admin` | Admin dashboard loads. Admin user must NOT contain "admin". |
 | **Redis Cache** | Check WP plugins or `docker logs redis` | Redis object cache plugin active and connected to `redis:6379`. |
-| **FTP Access** | `ftp -p aarie-c2.42.fr` (Port 21) | Connection opens; allows listing `/var/www/html` files using secrets credentials. |
-| **Showcase Page**| Access `http://aarie-c2.42.fr:8081` | Static portfolio website loads correctly. |
-| **Adminer UI** | Access `http://aarie-c2.42.fr:8080` | DB login panel visible; connects to `mariadb` with DB credentials. |
-| **Portainer** | Access `https://aarie-c2.42.fr:9000` | Portainer dashboard accessible. |
+| **FTP Access** | `ftp -p brnascim.42.fr` (Port 21) | Connection opens; allows listing `/var/www/html` files using secrets credentials. |
+| **Showcase Page**| Access `http://brnascim.42.fr:8081` | Static portfolio website loads correctly. |
+| **Adminer UI** | Access `http://brnascim.42.fr:8080` | DB login panel visible; connects to `mariadb` with DB credentials. |
+| **Portainer** | Access `https://brnascim.42.fr:9000` | Portainer dashboard accessible. |
 | **Data Persistence**| Run `make clean` then `make` | Changes to WordPress pages/comments remain intact. |
 
 ---
@@ -153,7 +153,7 @@ rm /var/tmp/bigemptyfile
 2. Select your VM.
 3. Click **File** > **Export Appliance...**
 4. Choose **Format**: `Open Virtualization Format 2.0 (OVA)` or `1.0`.
-5. Specify target file path (e.g. `Inception_aarie-c2.ova`).
+5. Specify target file path (e.g. `Inception_brnascim.ova`).
 6. Click **Export**. Copy this `.ova` file to a USB flash drive.
 
 ### Step C: Importing on 42 Workstation

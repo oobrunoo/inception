@@ -10,7 +10,7 @@ if [ ! -f /etc/ssl/nginx/nginx.crt ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout /etc/ssl/nginx/nginx.key \
         -out /etc/ssl/nginx/nginx.crt \
-        -subj "/C=BR/ST=SP/L=SaoPaulo/O=42/CN=aarie-c2.42.fr"
+        -subj "/C=BR/ST=SP/L=SaoPaulo/O=42/CN=brnascim.42.fr"
     
     chmod 600 /etc/ssl/nginx/nginx.key
     chmod 644 /etc/ssl/nginx/nginx.crt

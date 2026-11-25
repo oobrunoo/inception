@@ -47,12 +47,6 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
         --user_pass="${WP_USER_PASSWORD}" \
         --allow-root
 
-    # ── Redis cache ───────────────────────────────────────────────────────────
-    wp plugin install redis-cache --activate --allow-root --path="${WP_PATH}"
-    wp config set WP_REDIS_HOST redis   --allow-root --path="${WP_PATH}"
-    wp config set WP_REDIS_PORT 6379    --allow-root --path="${WP_PATH}" --raw
-    wp redis enable                     --allow-root --path="${WP_PATH}"
-
     chown -R www-data:www-data "${WP_PATH}"
 fi
 

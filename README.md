@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by aarie-c2.*
+*This project has been created as part of the 42 curriculum by brnascim.*
 
 ---
 
@@ -55,7 +55,7 @@ This project uses a custom **bridge network** (`inception_net`). Containers comm
 | Persistence | Survives `docker compose down` | May be removed |
 | Inspectability | Easy to navigate on host | Hidden inside Docker data dir |
 
-Volumes are configured with `driver_opts: type: none, o: bind` to pin data at `/home/aarie-c2/data/{db,wordpress}`.
+Volumes are configured with `driver_opts: type: none, o: bind` to pin data at `/home/brnascim/data/{db,wordpress}`.
 
 ---
 
@@ -65,8 +65,8 @@ Volumes are configured with `driver_opts: type: none, o: bind` to pin data at `/
 - Docker Engine ≥ 24
 - Docker Compose v2
 - `make`
-- Add to `/etc/hosts`: `127.0.0.1  aarie-c2.42.fr`
-- Create the data directory: `sudo mkdir -p /home/aarie-c2/data`
+- Add to `/etc/hosts`: `127.0.0.1  brnascim.42.fr`
+- Create the data directory: `sudo mkdir -p /home/brnascim/data`
 
 ### Run
 

@@ -15,7 +15,7 @@ newgrp docker
 
 Also add the domain to `/etc/hosts`:
 ```bash
-echo "127.0.0.1  aarie-c2.42.fr" | sudo tee -a /etc/hosts
+echo "127.0.0.1  brnascim.42.fr" | sudo tee -a /etc/hosts
 ```
 
 ---
@@ -55,14 +55,14 @@ EOF
 Non-sensitive configuration is in `srcs/.env`:
 
 ```dotenv
-DOMAIN_NAME=aarie-c2.42.fr
+DOMAIN_NAME=brnascim.42.fr
 MYSQL_DATABASE=wordpress
 MYSQL_USER=wp_user
 WP_ADMIN_USER=aarie_chief
-WP_ADMIN_EMAIL=admin@aarie-c2.42.fr
+WP_ADMIN_EMAIL=admin@brnascim.42.fr
 WP_USER=aarie_c2
-WP_USER_EMAIL=user@aarie-c2.42.fr
-WP_TITLE=Inception by aarie-c2
+WP_USER_EMAIL=user@brnascim.42.fr
+WP_TITLE=Inception by brnascim
 FTP_USER=ftpuser
 ```
 
@@ -71,8 +71,8 @@ FTP_USER=ftpuser
 The Makefile does this automatically, but you can do it manually:
 
 ```bash
-sudo mkdir -p /home/aarie-c2/data/db
-sudo mkdir -p /home/aarie-c2/data/wordpress
+sudo mkdir -p /home/brnascim/data/db
+sudo mkdir -p /home/brnascim/data/wordpress
 ```
 
 ---
@@ -133,8 +133,8 @@ All persistent data is stored on the **host** filesystem:
 
 | Data | Host path | Volume name |
 |------|-----------|-------------|
-| MariaDB database files | `/home/aarie-c2/data/db` | `wordpress_db` |
-| WordPress site files | `/home/aarie-c2/data/wordpress` | `wordpress_files` |
+| MariaDB database files | `/home/brnascim/data/db` | `wordpress_db` |
+| WordPress site files | `/home/brnascim/data/wordpress` | `wordpress_files` |
 
 Data **survives** `make down` (stop only).  
 Data is **removed** by `make clean` or `make fclean`.
@@ -184,7 +184,7 @@ inception/
 
 | Problem | Likely cause | Fix |
 |---------|-------------|-----|
-| `https://aarie-c2.42.fr` unreachable | `/etc/hosts` entry missing | `echo "127.0.0.1 aarie-c2.42.fr" \| sudo tee -a /etc/hosts` |
+| `https://brnascim.42.fr` unreachable | `/etc/hosts` entry missing | `echo "127.0.0.1 brnascim.42.fr" \| sudo tee -a /etc/hosts` |
 | WordPress shows DB connection error | MariaDB not ready yet | Wait ~30s and refresh, or `docker logs wordpress` |
 | Port 443 already in use | Another service using port 443 | `sudo lsof -i :443` and stop conflicting process |
 | `make clean` fails on volumes | Volumes in use | Run `make down` first, then `make clean` |
