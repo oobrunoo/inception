@@ -1,0 +1,13 @@
+*.txt
+
+data/
+srcs/requirements/bonus/
+.DS_Store
+.vscode/
+
+.env
+srcs/.env
+secrets/
+*.key
+*.crt
+*.pem
