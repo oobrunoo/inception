@@ -2,16 +2,12 @@
 
 ## What Services Are Provided?
 
-The Inception stack exposes the following services:
+The Inception stack runs three core containers (**NGINX**, **WordPress + php-fpm**, and **MariaDB**) and exposes the following endpoints via HTTPS (port `443`):
 
 | Service | URL / Address | Description |
 |---------|--------------|-------------|
 | WordPress site | `https://brnascim.42.fr` | Main website (accept self-signed cert) |
 | WordPress admin | `https://brnascim.42.fr/wp-admin` | Administration dashboard |
-| Adminer | `http://brnascim.42.fr:8080` | Database management UI |
-| Portainer | `http://brnascim.42.fr:9000` | Container management dashboard |
-| Static website | `http://brnascim.42.fr:80` | Portfolio/showcase site |
-| FTP | `ftp://brnascim.42.fr:21` | File access to WordPress volume |
 
 ---
 
@@ -43,9 +39,9 @@ make status
 3. Accept the self-signed TLS certificate warning
 
 ### WordPress Admin Panel
-- URL: `https://brnascim.42.fr/wp-admin`
-- Admin username: see `secrets/credentials.txt` → `ADMIN_PASSWORD`
-- Admin login: `aarie_chief` (defined in `srcs/.env`)
+- **URL:** `https://brnascim.42.fr/wp-admin`
+- **Admin login:** `superuser` (defined in `srcs/.env`)
+- **Admin password:** see `ADMIN_PASSWORD` in `secrets/credentials.txt`
 
 ---
 
@@ -57,11 +53,11 @@ All credentials are stored in the `secrets/` directory at the root of the reposi
 |------|----------|
 | `secrets/db_password.txt` | MariaDB `wp_user` password |
 | `secrets/db_root_password.txt` | MariaDB `root` password |
-| `secrets/credentials.txt` | WordPress admin + user + FTP passwords |
+| `secrets/credentials.txt` | WordPress admin and regular user passwords |
 
 To change a password:
 1. Edit the corresponding file in `secrets/`
-2. Run `make fclean && make` to rebuild with the new secret
+2. Run `make clean && make` to reinitialize the services with the new secret
 
 ---
 
@@ -75,11 +71,6 @@ make status
 docker logs nginx
 docker logs wordpress
 docker logs mariadb
-docker logs redis
-docker logs ftp
-docker logs adminer
-docker logs portainer
-docker logs website
 
 # Verify MariaDB is responding
 docker exec mariadb mysqladmin ping -u root -p

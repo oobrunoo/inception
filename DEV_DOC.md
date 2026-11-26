@@ -34,44 +34,44 @@ cd inception
 The `secrets/` directory is gitignored. You must create these files manually:
 
 ```bash
+mkdir -p secrets
+
 # MariaDB user password
 echo "YourStrongPassword1" > secrets/db_password.txt
 
 # MariaDB root password
 echo "YourStrongRootPassword1" > secrets/db_root_password.txt
 
-# WordPress admin, regular user, and FTP passwords
+# WordPress admin and regular user passwords
 cat > secrets/credentials.txt <<EOF
 ADMIN_PASSWORD=YourAdminPass1
 USER_PASSWORD=YourUserPass1
-FTP_PASSWORD=YourFtpPass1
 EOF
 ```
 
 > ⚠️ Never commit these files. They are in `.gitignore`.
 
-### 3. Review the environment file
+### 3. Create the environment file
 
-Non-sensitive configuration is in `srcs/.env`:
+Non-sensitive configuration lives in `srcs/.env` (also gitignored):
 
 ```dotenv
 DOMAIN_NAME=brnascim.42.fr
-MYSQL_DATABASE=wordpress
+MYSQL_DATABASE=wordpress_db
 MYSQL_USER=wp_user
-WP_ADMIN_USER=aarie_chief
-WP_ADMIN_EMAIL=admin@brnascim.42.fr
-WP_USER=aarie_c2
-WP_USER_EMAIL=user@brnascim.42.fr
-WP_TITLE=Inception by brnascim
-FTP_USER=ftpuser
+WP_TITLE=Inception brnascim
+WP_ADMIN_USER=superuser
+WP_ADMIN_EMAIL=superuser@42.fr
+WP_USER_LOGIN=editor_user
+WP_USER_EMAIL=editor@42.fr
 ```
 
-### 4. Create the host data directories
+### 4. Host data directories
 
-The Makefile does this automatically, but you can do it manually:
+The `Makefile` creates these automatically on `make`, or you can create them manually:
 
 ```bash
-sudo mkdir -p /home/brnascim/data/db
+sudo mkdir -p /home/brnascim/data/mariadb
 sudo mkdir -p /home/brnascim/data/wordpress
 ```
 
@@ -93,7 +93,6 @@ On first boot, the WordPress setup script will:
 3. Configure `wp-config.php`
 4. Install WordPress with admin credentials
 5. Create the second (author) user
-6. Install and enable the Redis Object Cache plugin
 
 This takes ~30–60 seconds on first run.
 
@@ -113,7 +112,7 @@ docker exec -it wordpress bash
 docker exec -it mariadb bash
 
 # Run a WP-CLI command inside the WordPress container
-docker exec wordpress wp plugin list --allow-root
+docker exec wordpress wp user list --allow-root
 
 # Check MariaDB from inside the container
 docker exec mariadb mysql -u root -p -e "SHOW DATABASES;"
@@ -122,7 +121,7 @@ docker exec mariadb mysql -u root -p -e "SHOW DATABASES;"
 docker network inspect srcs_inception_net
 
 # List all images built for this project
-docker images | grep -E "nginx|wordpress|mariadb|redis|ftp|website|adminer|portainer"
+docker images | grep -E "nginx|wordpress|mariadb"
 ```
 
 ---
@@ -133,7 +132,7 @@ All persistent data is stored on the **host** filesystem:
 
 | Data | Host path | Volume name |
 |------|-----------|-------------|
-| MariaDB database files | `/home/brnascim/data/db` | `wordpress_db` |
+| MariaDB database files | `/home/brnascim/data/mariadb` | `wordpress_db` |
 | WordPress site files | `/home/brnascim/data/wordpress` | `wordpress_files` |
 
 Data **survives** `make down` (stop only).  
@@ -155,10 +154,10 @@ inception/
 │   ├── db_root_password.txt
 │   └── credentials.txt
 └── srcs/
-    ├── .env                        # Non-sensitive env vars
+    ├── .env                        # Non-sensitive env vars (gitignored)
     ├── docker-compose.yml          # Service definitions
     └── requirements/
-        ├── nginx/                  # NGINX (TLS termination)
+        ├── nginx/                  # NGINX (TLS termination on port 443)
         │   ├── Dockerfile
         │   ├── conf/nginx.conf
         │   └── tools/generate_ssl.sh
@@ -166,16 +165,10 @@ inception/
         │   ├── Dockerfile
         │   ├── conf/www.conf
         │   └── tools/wp_setup.sh
-        ├── mariadb/                # MariaDB
-        │   ├── Dockerfile
-        │   ├── conf/my.cnf
-        │   └── tools/db_init.sh
-        └── bonus/
-            ├── redis/              # Redis cache
-            ├── ftp/                # FTP server (vsftpd)
-            ├── website/            # Static portfolio site
-            ├── adminer/            # DB admin UI
-            └── portainer/          # Container dashboard
+        └── mariadb/                # MariaDB
+            ├── Dockerfile
+            ├── conf/my.cnf
+            └── tools/db_init.sh
 ```
 
 ---
@@ -185,7 +178,6 @@ inception/
 | Problem | Likely cause | Fix |
 |---------|-------------|-----|
 | `https://brnascim.42.fr` unreachable | `/etc/hosts` entry missing | `echo "127.0.0.1 brnascim.42.fr" \| sudo tee -a /etc/hosts` |
-| WordPress shows DB connection error | MariaDB not ready yet | Wait ~30s and refresh, or `docker logs wordpress` |
-| Port 443 already in use | Another service using port 443 | `sudo lsof -i :443` and stop conflicting process |
-| `make clean` fails on volumes | Volumes in use | Run `make down` first, then `make clean` |
-| FTP passive connection fails | Wrong `pasv_address` | Edit `vsftpd.conf`: set `pasv_address` to host IP |
+| WordPress shows DB connection error | MariaDB not ready yet | Wait ~30s and refresh, or check `docker logs wordpress` |
+| Port 443 already in use | Another service using port 443 | `sudo lsof -i :443` and stop the conflicting process |
+| `make clean` fails on volumes | Volumes still in use | Run `make down` first, then `make clean` |

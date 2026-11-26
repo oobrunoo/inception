@@ -9,14 +9,9 @@
 **Inception** is a system administration project that builds a small but complete web infrastructure entirely with Docker. Every service runs in its own dedicated container, built from scratch from a `debian:bookworm` base image — no pre-made images from DockerHub.
 
 The stack delivers a fully functional WordPress site with:
-- **NGINX** as the sole HTTPS entry point (TLSv1.2 / TLSv1.3)
+- **NGINX** as the sole HTTPS entry point (TLSv1.2 / TLSv1.3 on port 443)
 - **WordPress + php-fpm** for the CMS
 - **MariaDB** for the relational database
-- **Redis** for object caching
-- **vsftpd** for FTP access to the WordPress volume
-- **A static portfolio website** (this repo's showcase page)
-- **Adminer** for database management
-- **Portainer CE** for container management
 
 ### Key Design Choices
 
@@ -46,16 +41,16 @@ Passwords are stored in `secrets/` files and mounted as Docker secrets. Non-sens
 | Security | Services unreachable from outside unless port-mapped | All container ports exposed on host |
 | DNS | Containers resolve each other by service name | Must use host IPs |
 
-This project uses a custom **bridge network** (`inception_net`). Containers communicate by service name (e.g., `wordpress:9000`, `mariadb:3306`). Only required ports are published to the host.
+This project uses a custom **bridge network** (`inception_net`). Containers communicate by service name (e.g., `wordpress:9000`, `mariadb:3306`). Only port `443` (NGINX) is published to the host.
 
 #### Docker Volumes vs Bind Mounts
-| | Named Volume (with bind mount) | Anonymous Volume |
-|-|-------------------------------|-----------------|
-| Location | Explicit host path | Docker-managed path |
-| Persistence | Survives `docker compose down` | May be removed |
-| Inspectability | Easy to navigate on host | Hidden inside Docker data dir |
+| | Docker Volumes | Bind Mounts |
+|-|----------------|-------------|
+| Management | Managed by Docker (`docker volume`) | Managed directly by the host OS |
+| Portability | High (decoupled from host directory structure) | Tied to a specific host path |
+| Isolation | Safer from accidental host modifications | Directly exposed on the host filesystem |
 
-Volumes are configured with `driver_opts: type: none, o: bind` to pin data at `/home/brnascim/data/{db,wordpress}`.
+This project uses **named Docker volumes** configured with `driver_opts` (`type: none`, `o: bind`) to combine Docker volume management with explicit host persistence at `/home/brnascim/data/{mariadb,wordpress}`.
 
 ---
 
@@ -66,7 +61,7 @@ Volumes are configured with `driver_opts: type: none, o: bind` to pin data at `/
 - Docker Compose v2
 - `make`
 - Add to `/etc/hosts`: `127.0.0.1  brnascim.42.fr`
-- Create the data directory: `sudo mkdir -p /home/brnascim/data`
+- Create `srcs/.env` and `secrets/` as detailed in `DEV_DOC.md`
 
 ### Run
 
@@ -94,15 +89,12 @@ make fclean
 - [NGINX docs](https://nginx.org/en/docs/)
 - [WordPress CLI (wp-cli)](https://wp-cli.org/)
 - [MariaDB Knowledge Base](https://mariadb.com/kb/en/)
-- [Redis docs](https://redis.io/docs/)
-- [vsftpd manual](https://security.appspot.com/vsftpd.html)
-- [Portainer docs](https://docs.portainer.io/)
 
 ### AI Usage
-AI (Antigravity / Claude) was used for the following tasks:
+AI was used for the following tasks:
 - **Scaffolding**: generating the initial directory structure and boilerplate Dockerfiles
-- **Configuration**: drafting nginx.conf, vsftpd.conf, php-fpm pool, MariaDB config
+- **Configuration**: drafting `nginx.conf`, php-fpm pool, and MariaDB config
 - **Entrypoint scripts**: structuring the init logic for MariaDB bootstrap and WordPress WP-CLI automation
-- **Documentation**: drafting README.md, USER_DOC.md, DEV_DOC.md structure
+- **Documentation**: drafting `README.md`, `USER_DOC.md`, and `DEV_DOC.md` structure
 
 All AI-generated content was reviewed, tested, and adjusted. I take full responsibility for every line in this repository.
