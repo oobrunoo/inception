@@ -1,7 +1,6 @@
 *.txt
 
 data/
-srcs/requirements/bonus/
 .DS_Store
 .vscode/
 
